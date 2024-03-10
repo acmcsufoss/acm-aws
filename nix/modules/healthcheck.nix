@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, self, ... }:
 
 let
 	self = config.services.healthcheck;
@@ -16,7 +16,7 @@ let
 			fi
 		'') +
 		(optionalString (self.httpEndpoint != null) ''
-			${<acm-aws/scripts>}/healthcheck-http ${self.httpEndpoint}
+			${self}/scripts/healthcheck-http ${self.httpEndpoint}
 		'');
 
 	checkDeps =

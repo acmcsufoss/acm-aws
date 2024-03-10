@@ -15,7 +15,7 @@ main() {
 			exit 1
 		fi
 
-		system=$(nix-instantiate --eval --json "./servers/$builderMachine/" -A pkgs.system | jq -r)
+		system=$(nix eval --raw ".#nixosConfigurations.${builderMachine}.pkgs.system")
 		if [[ -z "$system" ]]; then
 			echo "Could not determine system type for server '$builderMachine'" >&2
 			exit 1

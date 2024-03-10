@@ -1,8 +1,4 @@
-{ stdenv, jre, writeTextFile }:
-
-let
-	pkgutil = import <acm-aws/nix/pkgutil.nix>;
-in
+{ stdenv, pkgutil, jre, writeTextFile }:
 
 {
 	pname,

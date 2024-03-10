@@ -1,8 +1,4 @@
-{ config, lib, pkgs, ... }:
-
-let
-	sources = import <acm-aws/nix/sources.nix>;
-in
+{ config, lib, pkgs, self, sources, ... }:
 
 {
 	services.managed.enable = true;
@@ -10,18 +6,18 @@ in
 	services.managed.services = with lib; {
 		triggers = {
 			command = getExe pkgs.triggers;
-			environment = import <acm-aws/secrets/triggers-env.nix>;
+			environment = import (self + "/secrets/triggers-env.nix");
 		};
 
 		pomo = {
 			command = getExe pkgs.pomo;
-			environment = import <acm-aws/secrets/pomo.nix>;
+			environment = import (self + "/secrets/pomo.nix");
 			serviceConfig.StartLimitInterval = "0"; # Permit unlimited restarts.
 		};
 
 		acm-nixie = {
 			command = getExe pkgs.acm-nixie;
-			environment = import <acm-aws/secrets/acm-nixie-env.nix>;
+			environment = import (self + "/secrets/acm-nixie-env.nix");
 		};
 
 		crying-counter = {
@@ -40,14 +36,14 @@ in
 
 				${getExe pkgs.crying-counter}
 			'';
-			environment = import <acm-aws/secrets/crying-counter-env.nix>;
+			environment = import (self + "/secrets/crying-counter-env.nix");
 		};
 
 		discord-conversation-summary-bot = {
 			command = getExe pkgs.discord_conversation_summary_bot;
 			workingDirectory = pkgs.writeTextDir
 				"config.json"
-				(builtins.readFile <acm-aws/secrets/discord_conversation_summary_bot.json>);
+				(builtins.readFile (self + "/secrets/discord_conversation_summary_bot.json"));
 		};
 
 		discord-ical-srv = {
@@ -55,7 +51,7 @@ in
 				(getExe pkgs.discord-ical-srv)
 				"-l" "unix:///run/discord-ical-srv/http.sock"
 			];
-			environment = import <acm-aws/secrets/discord-ical-srv-env.nix>;
+			environment = import (self + "/secrets/discord-ical-srv-env.nix");
 		};
 
 		discord-ical-reminder = {
@@ -64,7 +60,7 @@ in
 				"-c"
 				"${pkgs.writeText
 					"discord-ical-reminder.json"
-					(builtins.toJSON (import <acm-aws/secrets/ical-reminders.nix>))}"
+					(builtins.toJSON (import (self + "/secrets/ical-reminders.nix")))}"
 			];
 		};
 
@@ -97,6 +93,6 @@ in
 
 	services.dischord = {
 		enable = true;
-		config = builtins.readFile <acm-aws/secrets/dischord-config.toml>;
+		config = builtins.readFile (self + "/secrets/dischord-config.toml");
 	};
 }

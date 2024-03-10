@@ -1,4 +1,4 @@
-{ lib, buildJavaPackage, fetchFromGitHub }:
+{ lib, sources, buildJavaPackage, fetchFromGitHub }:
 
 let
 	pkgs = import (fetchFromGitHub {
@@ -15,6 +15,6 @@ assert lib.versionAtLeast jre.version "19.0.0";
 
 buildJavaPackage {
 	pname = "triggers";
-	jar = (import <acm-aws/nix/sources.nix>).triggers;
+	jar = sources.triggers;
 	inherit jre;
 }

@@ -1,8 +1,7 @@
-{ system ? builtins.currentSystem }:
+{ sources, system }:
 
 let
-	src   = import <acm-aws/nix/sources.nix>;
-	flake = import src.fullyhacks-qrms;
+	flake = import sources.fullyhacks-qrms;
 in
 
 flake.packages.${system}.default

@@ -3,7 +3,6 @@
 {
 	imports = [
 		(modulesPath + "/virtualisation/amazon-image.nix")
-		<acm-aws/servers/base.nix>
 		./services.nix
 		./telemetry.nix
 	];

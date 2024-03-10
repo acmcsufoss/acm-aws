@@ -27,72 +27,101 @@
 		nix-npm-buildpackage,
 	}@inputs:
 
-	flake-utils.lib.eachDefaultSystem (system:
-		let
-			pkgs = nixpkgs.legacyPackages.${system};
-			overlays = self.overlays.${system};
-		in
-		{
-			overlays = {
-				# Overlay for the build tools that our packages use.
-				buildTools = final: prev: {
-					#
-					# Build tools
-					#
-					inherit (gomod2nix.legacyPackages.${system})
-						mkGoEnv buildGoApplication;
-					inherit (poetry2nix.lib.mkPoetry2Nix { pkgs = prev; })
-						mkPoetryApplication;
-					inherit (nix-npm-buildpackage.legacyPackages.${system})
-						buildNpmPackage
-						buildYarnPackage;
-					buildDenoPackage = final.callPackage ./nix/packaging/deno.nix { };
-					buildJavaPackage = final.callPackage ./nix/packaging/java.nix { };
-					buildGradlePackage = final.callPackage ./nix/packaging/gradle.nix { };
-					buildPoetryPackage = final.callPackage ./nix/packaging/poetry.nix { };
+	let
+		tailnet = "wahoo-noodlefish";
+		specialArgs = inputs // { inherit tailnet; };
+	in
 
-					#
-					# Miscellanous tools
-					#
-					nix-update = final.callPackage ./nix/nix-update.nix { };
-
-					#
-					# Miscellanous utility derivations
-					#
-					pkgutil = final.callPackage ./nix/pkgutil.nix { };
-					sources = import ./nix/sources.nix {
-						inherit system;
-						pkgs = prev;
-					};
-				};
-				# Overlay adding our own packages.
-				default = final: prev: self.packages.${system};
+	{
+		nixosConfigurations = {
+			cirno = nixpkgs.lib.nixosSystem {
+				system = "x86_64-linux";
+				modules = [
+					./servers/base.nix
+					./servers/cirno/configuration.nix
+				];
+				inherit specialArgs;
 			};
-
-			packages = import ./packages {
-				pkgs = nixpkgs.legacyPackages.${system}.extend (overlays.buildTools);
+			cs306 = nixpkgs.lib.nixosSystem {
+				system = "x86_64-linux";
+				modules = [
+					./servers/base.nix
+					./servers/cs306/configuration.nix
+				];
+				inherit specialArgs;
 			};
+		};
 
-			nixosConfigurations = {
-				cirno = nixpkgs.lib.nixosSystem {
-					system = "x86_64-linux";
-					modules = [
-						({ ... }: { nixpkgs.overlays = [ overlays.default ]; })
-						./servers/base.nix
-						./servers/cirno/configuration.nix
-					];
-					specialArgs = inputs // { inherit self; };
-				};
-				cs306 = nixpkgs.lib.nixosSystem {
-					system = "x86_64-linux";
-					modules = [
-						({ ... }: { nixpkgs.overlays = [ overlays.default ]; })
-						./servers/base.nix
-						./servers/cs306/configuration.nix
-					];
-					specialArgs = inputs // { inherit self; };
-				};
+		# Overlay for the build tools that our packages use.
+		overlays.buildTools = final: prev: {
+			#
+			# Build tools
+			#
+			inherit (gomod2nix.legacyPackages.${prev.system})
+				mkGoEnv buildGoApplication gomod2nix;
+
+			inherit (poetry2nix.lib.mkPoetry2Nix { pkgs = prev; })
+				mkPoetryApplication;
+
+			inherit (nix-npm-buildpackage.legacyPackages.${prev.system})
+				buildNpmPackage
+				buildYarnPackage;
+
+			buildDenoPackage = final.callPackage ./nix/packaging/deno.nix { };
+			buildJavaPackage = final.callPackage ./nix/packaging/java.nix { };
+			buildGradlePackage = final.callPackage ./nix/packaging/gradle.nix { };
+			buildPoetryPackage = final.callPackage ./nix/packaging/poetry.nix { };
+
+			#
+			# Miscellanous tools
+			#
+			nix-update = final.callPackage ./nix/nix-update.nix { };
+
+			#
+			# Miscellanous utility derivations
+			#
+			pkgutil = final.callPackage ./nix/pkgutil.nix { };
+			sources = import ./nix/sources.nix {
+				pkgs = prev;
+				system = prev.system;
 			};
-		}
-	);
+		};
+	} //
+	(flake-utils.lib.eachDefaultSystem (system: {
+		packages = import ./packages {
+			pkgs = nixpkgs.legacyPackages.${system}.extend (self.overlays.buildTools);
+		};
+
+		devShells.default =
+			let
+				pkgs = import nixpkgs {
+					inherit system;
+					config.allowUnfree = true;
+				};
+			in
+			pkgs.mkShell {
+				name = "acm-aws-shell";
+
+				buildInputs = with pkgs; [
+					terraform
+					awscli2
+					rnix-lsp
+					nix-update
+					jq
+					niv
+					git
+					git-crypt
+					openssl
+					yamllint
+					expect
+					shellcheck
+
+					# for gomod2nix
+					gomod2nix.packages.${system}.default
+				];
+
+				# for Terraform
+				TF_VAR_tailnet_name = tailnet;
+			};
+	}));
 }

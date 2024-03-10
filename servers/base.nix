@@ -1,11 +1,11 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, self, ... }:
 
 let sources = import ../nix/sources.nix;
 
 in {
 	imports = [
-		<acm-aws/packages/imports.nix>
-		<acm-aws/nix/modules>
+		(self + "/packages/module.nix")
+		(self + "/nix/modules")
 	];
 
 	services.journald = {

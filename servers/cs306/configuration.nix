@@ -2,12 +2,10 @@
 # your system.	Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
-	imports = [ # Include the results of the hardware scan.
-		<acm-aws/servers/base.nix>
-		# <acm-aws/containers/cs306/test.nix>
+	imports = [
 		./hardware-configuration.nix
 		./services.nix
 		./recovery.nix

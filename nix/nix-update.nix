@@ -1,5 +1,6 @@
 { lib
 , python3
+, sources
 , fetchFromGitHub
 , nix
 , nix-prefetch-git
@@ -8,7 +9,7 @@
 }:
 
 let
-	src = (import ./sources.nix).diamondburned_nix-update;
+	src = sources.diamondburned_nix-update;
 in
 
 python3.pkgs.buildPythonApplication rec {

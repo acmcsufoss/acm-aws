@@ -1,13 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, self, tailnet, ... }:
 
 let
-	tailnet = builtins.getEnv "TAILNET_NAME";
 	tailnetAddr = name: "${name}.${tailnet}.ts.net";
 in
-
-assert lib.assertMsg
-	(tailnet != null && tailnet != "")
-	"$TAILNET_NAME environment variable must be set, are you in the nix-shell?";
 
 {
 	# Enable netdata, which is a lightweight alternative to Grafana.
@@ -40,7 +35,7 @@ assert lib.assertMsg
 					enabled = yes
 					enable compression = yes
 
-				[${builtins.readFile <acm-aws/secrets/netdata-key>}]
+				[${builtins.readFile (self + "/secrets/netdata-key")}]
 					enabled = yes
 					allow from = 100.*
 					default memory mode = dbengine
