@@ -1,3 +1,5 @@
+{ pkgs }:
+
 {
 	version = src:
 		if (src ? version && src.version != "")

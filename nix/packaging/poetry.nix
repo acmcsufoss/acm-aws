@@ -1,8 +1,4 @@
-{ poetry2nix, writeShellScriptBin, python3 }:
-
-let
-	pkgutil = import <acm-aws/nix/pkgutil.nix>;
-in
+{ pkgutil, mkPoetryApplication, writeShellScriptBin, python3 }:
 
 {
 	name ? "${pname}-${version}",
@@ -16,7 +12,7 @@ in
 }:
 
 let
-	poetryApplication = (poetry2nix.mkPoetryApplication {
+	poetryApplication = (mkPoetryApplication {
 		inherit src python;
 		pyproject = "${src}/pyproject.toml";
 		poetrylock = "${src}/poetry.lock";

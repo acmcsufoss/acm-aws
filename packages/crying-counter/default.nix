@@ -1,8 +1,4 @@
-{ buildPoetryPackage, git, runCommandLocal }:
-
-let
-	sources = import <acm-aws/nix/sources.nix>;
-in
+{ buildPoetryPackage, git, runCommandLocal, sources }:
 
 buildPoetryPackage {
 	pname = "crying-counter";

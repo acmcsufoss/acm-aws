@@ -1,9 +1,4 @@
-{ lib, buildGoModule }:
-
-let
-	sources = import <acm-aws/nix/sources.nix>;
-	pkgutil = import <acm-aws/nix/pkgutil.nix>;
-in
+{ lib, buildGoModule, sources, pkgutil }:
 
 buildGoModule rec {
 	pname = "christmasd";

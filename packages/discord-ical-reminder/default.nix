@@ -1,4 +1,4 @@
-{ pkgs, fetchFromGitHub, lib }:
+{ pkgs, fetchFromGitHub, sources, lib }:
 
 let
 	newerPkgs = fetchFromGitHub {
@@ -26,7 +26,7 @@ buildGo121Module rec {
   pname = "discord-ical-reminder";
   version = builtins.substring 0 7 src.rev;
  
-  src = (import <acm-aws/nix/sources.nix>).discord-ical-reminder;
+  src = sources.discord-ical-reminder;
   subPackages = [ "." ];
   vendorSha256 = "sha256-nYBaqD4atFpTgxW2UqxhLNGJ5rAtJrZ13wdAgW0908w=";
 }

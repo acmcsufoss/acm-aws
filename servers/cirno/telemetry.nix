@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, self, ... }:
 
 {
 	# Enable netdata, which is a lightweight alternative to Grafana.
@@ -21,7 +21,7 @@
 			"stream.conf" = pkgs.writeText "stream.conf" ''
 				[stream]
 					enabled = yes
-					api key = ${builtins.readFile <acm-aws/secrets/netdata-key>}
+					api key = ${builtins.readFile (self + "/secrets/netdata-key")}
 					destination = cs306:19999
 			'';
 		};

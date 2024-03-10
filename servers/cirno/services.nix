@@ -1,14 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-let
-	sources = import <acm-aws/nix/sources.nix>;
-in
+{ config, lib, pkgs, self, sources, ... }:
 
 {
 	services.diamondburned.caddy = {
 		enable = true;
 		configFile = ./Caddyfile;
-		environment = import <acm-aws/secrets/caddy-env.nix>;
+		environment = import (self + "/secrets/caddy-env.nix");
 	};
 
 	systemd.services.acmregister = {
@@ -16,7 +12,7 @@ in
 		description = "ACM member registration Discord bot";
 		after = [ "network-online.target" ];
 		wantedBy = [ "multi-user.target" ];
-		environment = import ./secrets/acmregister-env.nix;
+		environment = import (self + "/secrets/acmregister-env.nix");
 		serviceConfig = {
 			Type = "simple";
 			ExecStart = "${pkgs.acmregister}/bin/acmregister";
@@ -28,7 +24,7 @@ in
 	systemd.services.sendlimiter =
 		let
 			extraArgs = [];
-			secrets = import <acm-aws/secrets/sendlimiter.nix>;
+			secrets = import (self + "/secrets/sendlimiter.nix");
 			args = lib.concatStringsSep
 				" "
 				(map lib.escapeShellArg (extraArgs ++ secrets.channelIDs));
@@ -59,7 +55,7 @@ in
 
 	systemd.services."fullyhacks-qrms" =
 		let
-			tokenFile = <acm-aws/secrets/fullyhacks-token.txt>;
+			tokenFile = self + "/secrets/fullyhacks-token.txt";
 			port = 38574;
 		in
 			{

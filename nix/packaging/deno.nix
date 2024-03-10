@@ -1,7 +1,4 @@
-{ runCommand, deno, makeWrapper, writeShellScript, jq, tree }:
-
-let pkgutil = import <acm-aws/nix/pkgutil.nix>;
-in
+{ runCommand, pkgutil, deno, makeWrapper, writeShellScript, jq, tree }:
 
 {
 	name ? "${pname}-${version}",

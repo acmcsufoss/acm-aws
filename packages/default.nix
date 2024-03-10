@@ -1,4 +1,4 @@
-{ pkgs ? import <acm-aws/nix/nixpkgs.nix> }:
+{ pkgs }:
 
 rec {
 	jre_small = pkgs.callPackage ./jre-small {};

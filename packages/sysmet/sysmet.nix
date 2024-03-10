@@ -2,10 +2,11 @@
 
 with lib;
 
-let cfg = config.services.diamondburned.sysmet;
+let
+	cfg = config.services.diamondburned.sysmet;
 	enable = cfg.http.enable or cfg.update.enable or cfg.gc.enable;
-
-in {
+in
+{
 	options.services.diamondburned.sysmet = {
 		http = {
 			enable = mkEnableOption "sysmet HTTP server";

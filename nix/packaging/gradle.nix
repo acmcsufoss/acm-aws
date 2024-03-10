@@ -1,7 +1,4 @@
-{ stdenv, jre, makeWrapper, gradle_7, writeShellScript }:
-
-let pkgutil = import <acm-aws/nix/pkgutil.nix>;
-in
+{ stdenv, pkgutil, jre, makeWrapper, gradle_7, writeShellScript }:
 
 {
 	pname,
